@@ -1,0 +1,5 @@
+<div class="flex flex-row p-6 bg-grey rounded-xl shadow-lg">
+  <ng-container *ngFor="let post of posts">
+    <app-post class="post-container basis-1/4" [post]="post"></app-post>
+  </ng-container>
+</div>

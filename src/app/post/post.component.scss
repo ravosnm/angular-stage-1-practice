@@ -1,0 +1,10 @@
+
+.collapsed {
+  height: 2.2em;
+  text-overflow: ellipsis;
+  // white-space: nowrap;
+  overflow: hidden;
+}
+.expanded {
+  height: auto;
+}
