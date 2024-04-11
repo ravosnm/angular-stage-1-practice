@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { Post } from '../model/post';
 
 @Component({
   selector: 'app-post',
@@ -7,11 +8,7 @@ import { Component, Input } from '@angular/core';
 })
 export class PostComponent {
   @Input()
-  public post!: {
-    user: string;
-    published: Date;
-    content: string;
-  };
+  public post!: Post;
   isCollapsed = true;
 
   toggleCollapse(collapse: boolean) {
