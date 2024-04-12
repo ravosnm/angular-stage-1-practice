@@ -1,6 +1,0 @@
-<div class="basis-1/2 rounded-xl bg-gray-400 border-solid border-cyan-700 border-2 p-3 text-grey-700 m-2" >
-  <h3 class="font-bold text-2xl">{{ post.user}}</h3>
-  <h4 class="text-base">{{ post.published | date:'shortDate' }}</h4>
-  <p class="text-xs" [ngClass]="isCollapsed ? 'collapsed' : 'expanded' ">{{ post.content}}</p>
-  <p class="text-cyan-700 font-bold text-xs uppercase" (click)="toggleCollapse(!isCollapsed)">{{ isCollapsed ? 'View more' : 'View less' }}</p>
-</div>

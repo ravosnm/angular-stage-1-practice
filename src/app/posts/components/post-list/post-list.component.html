@@ -1,0 +1,22 @@
+<mat-grid-list cols="4" rowHeight="14rem">
+  <ng-container *ngFor="let post of postList">
+    <mat-grid-tile>
+      <app-post [post]="post"></app-post>
+    </mat-grid-tile>
+  </ng-container>
+</mat-grid-list>
+<div class="mx-auto text-center">
+  <button class="mx-auto" type="button" mat-flat-button color="primary" (click)="addPost()">Add new Post</button>
+</div>
+
+
+<!-- DEJO ESTO COMENTADO A PROPOSITO PARA BUSCARLE UNA VUELTA DESPUES A CUAL DE LOS DOS HTML QUEDA MEJOR -->
+<!--
+<div class="flex flex-row p-6">
+  <ng-container *ngFor="let post of postList">
+    <app-post class="basis-1/2" [post]="post"></app-post>
+  </ng-container>
+</div>
+<div class="mx-auto text-center">
+  <button class="mx-auto" type="button" mat-flat-button color="primary" (click)="addPost()">Add new Post</button>
+</div> -->
