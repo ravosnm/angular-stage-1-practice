@@ -35,5 +35,4 @@ export class PostComponent {
     this.store.dispatch(setPostToEdit({ post }))
     this.router.navigate(['posts', 'create']);
   }
-
 }

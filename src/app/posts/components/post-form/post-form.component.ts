@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostComponent } from '../post/post.component';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,9 +10,84 @@ import { Observable, filter, map, take, tap } from 'rxjs';
 import { PostService } from '../../post.service';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { Store } from '@ngrx/store';
+import { Store, createAction, props } from '@ngrx/store';
 import { getPostToEdit } from '../../state/posts.selectors';
-import { setPostToEdit } from '../../state/posts.actions';
+import { addPost, setPostToEdit, updatePost } from '../../state/posts.actions';
+import { ComponentStore } from '@ngrx/component-store';
+import { Actions, ofType } from '@ngrx/effects';
+
+export interface PostFormComponentState {
+  post: Post
+}
+
+const initialState: PostFormComponentState = {
+  post: {
+    user: '',
+    published: new Date,
+    content: ''
+  }
+}
+// actions
+export const createPostAction = createAction(
+  '[PostForm ComponentStore] Create Post in GlobalStore',
+  props<{ post: Post }>()
+);
+export const updatePostAction = createAction(
+  '[PostForm ComponentStore] Update Post in GlobalStore',
+  props<{ updatedPost: Post, outdatedPost: Post }>()
+);
+
+@Injectable()
+export class PostFormComponentStore extends ComponentStore<PostFormComponentState> {
+  constructor(public actions$: Actions, private globalStore: Store) {
+    super(initialState);
+  }
+
+  // selectors
+  getPost$ = this.select(
+    (state) => state
+  );
+  // updaters
+  setPostUserUpdater = this.updater((state, userName: string) => {
+    const statePost: Post = state.post;
+    statePost.user = userName
+    return {
+      ...state,
+      post: statePost
+    }
+  });
+  setPostContentUpdater = this.updater((state, content: string) => {
+    const statePost: Post = state.post;
+    statePost.content = content
+    return {
+      ...state,
+      post: statePost
+    }
+  });
+  // effects
+  createPostEffect = this.effect(() =>
+    this.actions$.pipe(
+      ofType(createPostAction),
+      map(action => {
+        this.globalStore.dispatch(addPost({ post: action.post }))
+      })
+    )
+  )
+
+
+  updatePostEffect = this.effect(() =>
+    this.actions$.pipe(
+      ofType(updatePostAction),
+      map(action => {
+        this.globalStore.dispatch(updatePost({ updatedPost: action.updatedPost, outdatedPost: action.outdatedPost}))
+        this.globalStore.dispatch(setPostToEdit({ post: {user: '', content: '', published: new Date()} }))
+      })
+    )
+  )
+
+}
+
+
 
 @Component({
   selector: 'app-post-form',
@@ -64,7 +139,7 @@ export class PostFormComponent implements OnInit {
 
 
 
-  constructor(private formBuilder: FormBuilder, private _postService: PostService, private router: Router, private store: Store) {}
+  constructor(private formBuilder: FormBuilder, private _postService: PostService, private router: Router, private store: Store, private componentStore: PostFormComponentStore) {}
 
   ngOnInit() {
     this.post$.pipe(
@@ -79,18 +154,23 @@ export class PostFormComponent implements OnInit {
   }
 
   submit() {
-    const postData: Post = {
-      user: this.postForm.value.userName ?? '',
-      published: new Date(),
-      content: this.postForm.value.content ?? '',
-    };
+    // const postData: Post = {
+    //   user: this.postForm.value.userName ?? '',
+    //   published: new Date(),
+    //   content: this.postForm.value.content ?? '',
+    // };
+    this.componentStore.setPostUserUpdater(this.postForm.value.userName ?? '')
+    this.componentStore.setPostContentUpdater(this.postForm.value.content ?? '')
 
     if(this.isNewPost) {
-      this._postService.createPost(postData);
+
+      this.componentStore.createPostEffect;
+//      this._postService.createPost(postData);
     }
     else {
-      this._postService.updatePost(postData, this.outdatedPost);
-      this.store.dispatch(setPostToEdit({ post: {user: '', content: '', published: new Date() } }))
+      this.componentStore.updatePostEffect;
+//      this._postService.updatePost(postData, this.outdatedPost);
+//      this.store.dispatch(setPostToEdit({ post: {user: '', content: '', published: new Date() } }))
     }
     this.router.navigate(['posts', 'list']);
   }

@@ -18,6 +18,17 @@
 </div>
 
 
+-is working?
+<br/>
+- {{ isWorkingState$ | async }}
+<br/>
+<br/>
+<mat-button-toggle-group name="isWorking">
+  <mat-button-toggle [value]="true" (click)="toggleIsWorking(true)">true</mat-button-toggle>
+  <mat-button-toggle [value]="false" (click)="toggleIsWorking(false)">false</mat-button-toggle>
+</mat-button-toggle-group>
+
+
 <!-- DEJO ESTO COMENTADO A PROPOSITO PARA BUSCARLE UNA VUELTA DESPUES A CUAL DE LOS DOS HTML QUEDA MEJOR -->
 <!--
 <div class="flex flex-row p-6">
