@@ -1,5 +1,13 @@
-<mat-grid-list cols="4" rowHeight="14rem">
-  <ng-container *ngFor="let post of postList">
+<mat-paginator style="margin-top: -35px" [length]="postsCount$ | async"
+  [pageSize]="page_size"
+  [pageSizeOptions]="pageSizeOptions"
+  (page)="handlePage($event)"
+  aria-label="Select page"
+>
+</mat-paginator>
+
+<mat-grid-list cols="4" rowHeight="18rem">
+  <ng-container *ngFor="let post of posts$ | async | paginate:page_size:page_number">
     <mat-grid-tile>
       <app-post [post]="post"></app-post>
     </mat-grid-tile>

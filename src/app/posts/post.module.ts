@@ -1,11 +1,7 @@
-import { NgModule, InjectionToken } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostService } from './post.service';
-import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Routes } from '@angular/router';
-
-
-export const GET_POST_URL = new InjectionToken<string>('GET_POST_URL');
 
 const routes: Routes = [
   {
@@ -26,15 +22,10 @@ const routes: Routes = [
 @NgModule({
   imports: [
     CommonModule,
-    HttpClientModule,
     RouterModule.forChild(routes)],
   declarations: [],
   exports: [],
   providers: [
-    {
-      provide: GET_POST_URL,
-      useValue: 'https://asmisalan.github.io/feedgram/posts.json'
-    },
     PostService
   ]
 })

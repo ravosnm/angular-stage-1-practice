@@ -19,7 +19,7 @@
       </mat-hint>
     </mat-form-field>
     <div class="mx-auto">
-      <button class="mx-2" mat-flat-button color="primary">Create Post</button>
+      <button class="mx-2" mat-flat-button color="primary">{{ isNewPost ? 'Create Post' : 'Update Post'}}</button>
       <button class="mx-2" type="button" mat-flat-button color="secondary" (click)="cancel()">Cancel</button>
     </div>
   </form>
