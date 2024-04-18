@@ -8,12 +8,12 @@ export class PostService {
 
   constructor(private store: Store) { }
 
-  createPost(post: Post) {
-    this.store.dispatch(addPost({ post: post }))
-  }
-  updatePost(updatedPost: Post, outdatedPost: Post) {
-    this.store.dispatch(updatePost({ updatedPost, outdatedPost}))
-  }
+  // createPost(post: Post) {
+  //   this.store.dispatch(addPost({ post: post }))
+  // }
+  // updatePost(updatedPost: Post, outdatedPost: Post) {
+  //   this.store.dispatch(updatePost({ updatedPost, outdatedPost}))
+  // }
   deletePost(post: Post) {
     this.store.dispatch(deletePost({ post }))
   }

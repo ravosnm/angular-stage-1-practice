@@ -10,84 +10,9 @@ import { Observable, filter, map, take, tap } from 'rxjs';
 import { PostService } from '../../post.service';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { Store, createAction, props } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { getPostToEdit } from '../../state/posts.selectors';
-import { addPost, setPostToEdit, updatePost } from '../../state/posts.actions';
-import { ComponentStore } from '@ngrx/component-store';
-import { Actions, ofType } from '@ngrx/effects';
-
-export interface PostFormComponentState {
-  post: Post
-}
-
-const initialState: PostFormComponentState = {
-  post: {
-    user: '',
-    published: new Date,
-    content: ''
-  }
-}
-// actions
-export const createPostAction = createAction(
-  '[PostForm ComponentStore] Create Post in GlobalStore',
-  props<{ post: Post }>()
-);
-export const updatePostAction = createAction(
-  '[PostForm ComponentStore] Update Post in GlobalStore',
-  props<{ updatedPost: Post, outdatedPost: Post }>()
-);
-
-@Injectable()
-export class PostFormComponentStore extends ComponentStore<PostFormComponentState> {
-  constructor(public actions$: Actions, private globalStore: Store) {
-    super(initialState);
-  }
-
-  // selectors
-  getPost$ = this.select(
-    (state) => state
-  );
-  // updaters
-  setPostUserUpdater = this.updater((state, userName: string) => {
-    const statePost: Post = state.post;
-    statePost.user = userName
-    return {
-      ...state,
-      post: statePost
-    }
-  });
-  setPostContentUpdater = this.updater((state, content: string) => {
-    const statePost: Post = state.post;
-    statePost.content = content
-    return {
-      ...state,
-      post: statePost
-    }
-  });
-  // effects
-  createPostEffect = this.effect(() =>
-    this.actions$.pipe(
-      ofType(createPostAction),
-      map(action => {
-        this.globalStore.dispatch(addPost({ post: action.post }))
-      })
-    )
-  )
-
-
-  updatePostEffect = this.effect(() =>
-    this.actions$.pipe(
-      ofType(updatePostAction),
-      map(action => {
-        this.globalStore.dispatch(updatePost({ updatedPost: action.updatedPost, outdatedPost: action.outdatedPost}))
-        this.globalStore.dispatch(setPostToEdit({ post: {user: '', content: '', published: new Date()} }))
-      })
-    )
-  )
-
-}
-
-
+import { PostFormComponentStore, createPostAction, updatePostAction } from './post-form.component.store';
 
 @Component({
   selector: 'app-post-form',
@@ -95,10 +20,12 @@ export class PostFormComponentStore extends ComponentStore<PostFormComponentStat
   imports: [CommonModule, PostComponent, ReactiveFormsModule, MatSelectModule, MatInputModule, MatFormFieldModule, MatButtonModule],
   templateUrl: './post-form.component.html',
   styleUrls: ['./post-form.component.scss'],
+  providers: [PostFormComponentStore]
 })
 export class PostFormComponent implements OnInit {
 
   post$: Observable<Post> = this.store.select(getPostToEdit);
+  updatedPost: Post = { user: '', content: '', published: new Date()};
   outdatedPost: Post = { user: '', content: '', published: new Date()};
   isNewPost = true;
 
@@ -121,7 +48,6 @@ export class PostFormComponent implements OnInit {
       return errors;
     })
   );
-
   public contentErrors$ = this.postForm.statusChanges.pipe(
     map((x) => this.postForm.get('content') as AbstractControl),
     filter((x) => x != null),
@@ -137,9 +63,8 @@ export class PostFormComponent implements OnInit {
     })
   );
 
-
-
-  constructor(private formBuilder: FormBuilder, private _postService: PostService, private router: Router, private store: Store, private componentStore: PostFormComponentStore) {}
+  constructor(private formBuilder: FormBuilder, private router: Router, private store: Store, private componentStore: PostFormComponentStore) {
+  }
 
   ngOnInit() {
     this.post$.pipe(
@@ -151,26 +76,19 @@ export class PostFormComponent implements OnInit {
         this.postForm.controls.userName.setValue(this.outdatedPost.user);
         this.postForm.controls.content.setValue(this.outdatedPost.content);
       })).subscribe();
+
+    this.postForm.valueChanges.pipe(
+      map((values) => this.componentStore.postUpdater(values))
+    ).subscribe();
+
   }
 
   submit() {
-    // const postData: Post = {
-    //   user: this.postForm.value.userName ?? '',
-    //   published: new Date(),
-    //   content: this.postForm.value.content ?? '',
-    // };
-    this.componentStore.setPostUserUpdater(this.postForm.value.userName ?? '')
-    this.componentStore.setPostContentUpdater(this.postForm.value.content ?? '')
-
     if(this.isNewPost) {
-
-      this.componentStore.createPostEffect;
-//      this._postService.createPost(postData);
+      this.store.dispatch(createPostAction());
     }
     else {
-      this.componentStore.updatePostEffect;
-//      this._postService.updatePost(postData, this.outdatedPost);
-//      this.store.dispatch(setPostToEdit({ post: {user: '', content: '', published: new Date() } }))
+      this.store.dispatch(updatePostAction({outdatedPost: this.outdatedPost}));
     }
     this.router.navigate(['posts', 'list']);
   }

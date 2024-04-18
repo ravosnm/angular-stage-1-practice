@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, PageEvent, MatPaginator } from '@angular/material/paginator';
 import { Store, createAction, createFeatureSelector, createSelector, props } from '@ngrx/store';
-import { requestAllPosts } from '../../state/posts.actions';
+import { requestAllPosts, setPostToEdit } from '../../state/posts.actions';
 import { Observable, filter, map, take, tap } from 'rxjs';
 import { getPosts, getPostsCount, getPostsLoaded } from '../../state/posts.selectors';
 import { SharedPipesModule } from '../../../pipes/shared-pipes.module';
@@ -104,6 +104,7 @@ export class PostListComponent implements OnInit {
 	}
 
   addPost() {
+    this.store.dispatch(setPostToEdit({ post: { user: '', content: '', published: new Date() } }))
     this.router.navigate(['posts', 'create']);
   }
 
